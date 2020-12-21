@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -80,6 +81,7 @@ public class WebTicketManagerShould {
 				+ " \"4A\": {\"booking_reference\": \"\", \"seat_number\": \"4\", \"coach\": \"A\"}}}";
 	}
 
+	@Ignore
 	@Test
 	public void reserve_all_seats_in_same_coach() throws IOException, InterruptedException {
 		// given
