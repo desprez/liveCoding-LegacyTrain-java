@@ -1,46 +1,49 @@
 package com.traintrain;
 
 public class Seat {
-    private String coachName;
-    private int seatNumber;
-    private String bookingRef;
 
-    public Seat(String coach, int seatNumber) {
-        this(coach, seatNumber, "");
-    }
+	private String coachName;
 
-    public Seat(String coachName, int seatNumber, String bookingRef) {
-        this.coachName = coachName;
-        this.seatNumber = seatNumber;
-        this.bookingRef = bookingRef;
-    }
+	private int seatNumber;
 
-    public String getCoachName() {
-        return coachName;
-    }
+	private String bookingRef;
 
-    public void setCoachName(String coachName) {
-        this.coachName = coachName;
-    }
+	public Seat(final String coach, final int seatNumber) {
+		this(coach, seatNumber, "");
+	}
 
-    public int getSeatNumber() {
-        return seatNumber;
-    }
+	public Seat(final String coachName, final int seatNumber, final String bookingRef) {
+		this.coachName = coachName;
+		this.seatNumber = seatNumber;
+		this.bookingRef = bookingRef;
+	}
 
-    public void setSeatNumber(int seatNumber) {
-        this.seatNumber = seatNumber;
-    }
+	public String getCoachName() {
+		return coachName;
+	}
 
-    public String getBookingRef() {
-        return bookingRef;
-    }
+	public void setCoachName(final String coachName) {
+		this.coachName = coachName;
+	}
 
-    public void setBookingRef(String bookingRef) {
-        this.bookingRef = bookingRef;
-    }
+	public int getSeatNumber() {
+		return seatNumber;
+	}
 
-    @Override
-    public String toString() {
-        return coachName + seatNumber;
-    }
+	public void setSeatNumber(final int seatNumber) {
+		this.seatNumber = seatNumber;
+	}
+
+	public String getBookingRef() {
+		return bookingRef;
+	}
+
+	public void setBookingRef(final String bookingRef) {
+		this.bookingRef = bookingRef;
+	}
+
+	@Override
+	public String toString() {
+		return coachName + seatNumber;
+	}
 }

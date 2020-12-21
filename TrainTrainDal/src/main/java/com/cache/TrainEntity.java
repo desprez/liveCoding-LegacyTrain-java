@@ -5,15 +5,15 @@ import java.util.List;
 
 public class TrainEntity {
 
-    private final String trainId;
-    public List<SeatEntity> Seats = new ArrayList<SeatEntity>();
+	private final String trainId;
+	public List<SeatEntity> Seats = new ArrayList<SeatEntity>();
 
-    public TrainEntity(String trainId) {
+	public TrainEntity(String trainId) {
 
-        this.trainId = trainId;
-    }
+		this.trainId = trainId;
+	}
 
-    public String getTrainId() {
-        return trainId;
-    }
+	public String getTrainId() {
+		return trainId;
+	}
 }

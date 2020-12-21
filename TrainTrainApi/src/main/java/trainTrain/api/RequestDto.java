@@ -1,15 +1,15 @@
 package trainTrain.api;
 
 public class RequestDto {
-    private String train_id;
+	private String train_id;
 
-    public int getNumber_of_seats() {
-        return number_of_seats;
-    }
+	public int getNumber_of_seats() {
+		return number_of_seats;
+	}
 
-    private int number_of_seats;
+	private int number_of_seats;
 
-    public String getTrain_id() {
-        return train_id;
-    }
+	public String getTrain_id() {
+		return train_id;
+	}
 }
