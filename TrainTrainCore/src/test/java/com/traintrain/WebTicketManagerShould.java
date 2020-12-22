@@ -80,6 +80,39 @@ public class WebTicketManagerShould {
 				"{{\"train_id\": \"9043-2020-12-21\", \"booking_reference\": \"2dadaz4\", \"seats\": [\"1B\", \"2B\"]}}");
 	}
 
+	@Test
+	public void ideally_not_reserve_seats_in_a_coach_if_it_exceed_70_percent_of_its_capacity()
+			throws IOException, InterruptedException {
+		// given
+		final String trainTopology = TrainTopologyGenerator.fixtureWith3CoachesAnd6seatsAlreadyReservedIn1rstCoach();
+		final String bookingRef = "2dadaz4";
+		when(bookingReferenceService.getBookingReference()).thenReturn(bookingRef);
+		when(dataTrainService.getTrain(TRAIN_ID)).thenReturn(trainTopology);
 
+		// when
+		final String reservation = webTicketManager.reserve(TRAIN_ID, 3);
+
+		// then
+		assertThat(reservation).isEqualTo(
+				"{{\"train_id\": \"9043-2020-12-21\", \"booking_reference\": \"2dadaz4\", \"seats\": [\"1B\", \"2B\", \"3B\"]}}");
+
+	}
+
+	@Test
+	public void reserve_seats_in_a_coach_even_if_it_exceed_70_percent_of_its_capacity_in_non_idel_case() throws IOException, InterruptedException {
+		// given
+		final String trainTopology = TrainTopologyGenerator.fixtureWith3CoachesAnd6seatsThen4Then4AlreadyReserved();
+		final String bookingRef = "2dadaz4";
+		when(bookingReferenceService.getBookingReference()).thenReturn(bookingRef);
+		when(dataTrainService.getTrain(TRAIN_ID)).thenReturn(trainTopology);
+
+		// when
+		final String reservation = webTicketManager.reserve(TRAIN_ID, 6);
+
+		// then
+		assertThat(reservation).isEqualTo(
+				"{{\"train_id\": \"9043-2020-12-21\", \"booking_reference\": \"2dadaz4\", \"seats\": [\"5B\", \"6B\", \"7B\", \"8B\", \"9B\", \"10B\"]}}");
+
+	}
 
 }

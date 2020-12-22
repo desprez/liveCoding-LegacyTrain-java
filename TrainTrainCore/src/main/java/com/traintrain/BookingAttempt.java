@@ -14,6 +14,10 @@ public class BookingAttempt {
 		this.availableSeats = availableSeats;
 	}
 
+	public BookingAttempt(final int seatsRequestedCount) {
+		this(seatsRequestedCount, new ArrayList<Seat>());
+	}
+
 	public boolean isFullFilled() {
 		return availableSeats.size() == seatsRequestedCount;
 	}

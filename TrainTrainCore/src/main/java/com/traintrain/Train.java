@@ -1,7 +1,6 @@
 package com.traintrain;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +10,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Train {
+
+	private static final double TRAIN_MAX_THRESHOLD_RESERVABLE_SEATS = 0.70;
 
 	public int ReservedSeats;
 
@@ -57,25 +58,47 @@ public class Train {
 	}
 
 	private long getReservedSeats() {
-		return getSeats().stream().filter(seat -> !seat.getBookingReference().isEmpty()).count();
+		return getSeats().stream().filter(seat -> !seat.isAvailable()).count();
 	}
 
 	public boolean doesNotExceedOverallTrainCapacityLimit(final int seatsRequestedCount) {
-		return getReservedSeats() + seatsRequestedCount <= Math.floor(ThresholdManager.getMaxRes() * getMaxSeat());
+		return getReservedSeats() + seatsRequestedCount <= Math
+				.floor(TRAIN_MAX_THRESHOLD_RESERVABLE_SEATS * getMaxSeat());
 	}
 
 	public BookingAttempt buildBookingAttempt(final int seatsRequestedCount) {
-		final List<Seat> availableSeats = new ArrayList<Seat>();
 
-		for (final Coach coach : coaches.values()) {
+		BookingAttempt bookingAttempt = new BookingAttempt(seatsRequestedCount);
 
-			final BookingAttempt bookingAttempt = coach.buildBookingAttempt(seatsRequestedCount);
-			if (bookingAttempt.isFullFilled()) {
-				return bookingAttempt;
-			}
+		bookingAttempt = buildBookingAttemptIdealCase(seatsRequestedCount, bookingAttempt);
 
+		if (!bookingAttempt.isFullFilled()) {
+			bookingAttempt = buildBookingAttemptNotIdealCase(seatsRequestedCount, bookingAttempt);
 		}
-		return new BookingAttempt(seatsRequestedCount, availableSeats);
+		return bookingAttempt;
+	}
+
+	private BookingAttempt buildBookingAttemptNotIdealCase(final int seatsRequestedCount,
+			BookingAttempt bookingAttempt) {
+		for (final Coach coach : coaches.values()) {
+			bookingAttempt = coach.buildBookingAttempt(seatsRequestedCount);
+			if (bookingAttempt.isFullFilled()) {
+				break;
+			}
+		}
+		return bookingAttempt;
+	}
+
+	private BookingAttempt buildBookingAttemptIdealCase(final int seatsRequestedCount, BookingAttempt bookingAttempt) {
+		for (final Coach coach : coaches.values()) {
+			if (coach.doesNotExceedOverallTrainCapacityLimit(seatsRequestedCount)) {
+				bookingAttempt = coach.buildBookingAttempt(seatsRequestedCount);
+				if (bookingAttempt.isFullFilled()) {
+					break;
+				}
+			}
+		}
+		return bookingAttempt;
 	}
 
 	public Map<String, Coach> getCoaches() {
