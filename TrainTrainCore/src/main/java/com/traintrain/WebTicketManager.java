@@ -4,13 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cache.ITrainCaching;
 import com.cache.SeatEntity;
-import com.cache.TrainCaching;
 
 public class WebTicketManager {
-
-	private final ITrainCaching trainCaching;
 
 	private final BookingReferenceService bookingReferenceService;
 
@@ -18,15 +14,12 @@ public class WebTicketManager {
 
 	public WebTicketManager(final BookingReferenceService bookingReferenceService,
 			final DataTrainService dataTrainService) throws InterruptedException {
-		trainCaching = new TrainCaching();
-		trainCaching.Clear();
+
 		this.bookingReferenceService = bookingReferenceService;
 		this.dataTrainService = dataTrainService;
 	}
 
 	public WebTicketManager() throws InterruptedException {
-		trainCaching = new TrainCaching();
-		trainCaching.Clear();
 		bookingReferenceService = new BookingReferenceServiceImpl();
 		dataTrainService = new DataTrainServiceImpl();
 	}
@@ -47,8 +40,6 @@ public class WebTicketManager {
 
 				bookingAttempt.assignBookingReference(bookingRef);
 
-				trainCaching.Save(toSeatsEntities(train,bookingAttempt.getAvailableSeats(), bookingRef));
-
 				dataTrainService.applyReservation(train, bookingAttempt.getAvailableSeats(), bookingRef);
 
 				return String.format("{{\"train_id\": \"%s\", \"booking_reference\": \"%s\", \"seats\": %s}}", train,
@@ -58,8 +49,6 @@ public class WebTicketManager {
 		}
 		return String.format("{{\"train_id\": \"%s\", \"booking_reference\": \"\", \"seats\": []}}", train);
 	}
-
-
 
 	private String dumpSeats(final List<Seat> seats) {
 		final StringBuilder sb = new StringBuilder("[");
