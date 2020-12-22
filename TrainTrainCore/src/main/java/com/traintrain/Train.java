@@ -1,18 +1,20 @@
 package com.traintrain;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class Train {
+
 	public int ReservedSeats;
+
 	public List<Seat> Seats;
 
-	public Train(String trainTopol) throws IOException {
+	public Train(final String trainTopol) throws IOException {
 
 		Seats = new ArrayList<Seat>();
 
@@ -22,26 +24,47 @@ public class Train {
 		// \"2\", \"coach\": \"A\"}}}";
 		final ObjectMapper objectMapper = new ObjectMapper();
 
-		Map<String, Map<String, SeatJson>> stuff_in_stuff = objectMapper.readValue(trainTopol,
+		final Map<String, Map<String, SeatJson>> stuff_in_stuff = objectMapper.readValue(trainTopol,
 				new TypeReference<Map<String, Map<String, SeatJson>>>() {
-				});
+		});
 
-		for (Map<String, SeatJson> value : stuff_in_stuff.values()) {
-			for (SeatJson seatJson : value.values()) {
-				int seat_number = Integer.parseInt(seatJson.seat_number);
+		for (final Map<String, SeatJson> value : stuff_in_stuff.values()) {
+			for (final SeatJson seatJson : value.values()) {
+				final int seat_number = Integer.parseInt(seatJson.seat_number);
 				Seats.add(new Seat(seatJson.coach, seat_number, seatJson.booking_reference));
 				if (!(new Seat(seatJson.coach, seat_number, seatJson.booking_reference).getBookingRef() == "")) {
-					this.ReservedSeats++;
+					ReservedSeats++;
 				}
 			}
 		}
 	}
 
 	public int getMaxSeat() {
-		return this.Seats.size();
+		return Seats.size();
 	}
 
-	public boolean hasLessThanThreshold(int i) {
+	public boolean hasLessThanThreshold(final int i) {
 		return ReservedSeats < i;
+	}
+
+	public boolean doesNotExceedOverallTrainCapacityLimit(final int seatsRequestedCount) {
+		return ReservedSeats + seatsRequestedCount <= Math.floor(ThresholdManager.getMaxRes() * getMaxSeat());
+	}
+
+	public List<Seat> findAvailableSeats(final int seatsRequestedCount) {
+
+		final List<Seat> availableSeats = new ArrayList<Seat>();
+
+		// find seats to reserve
+		for (int index = 0, i = 0; index < Seats.size(); index++) {
+			final Seat each = Seats.get(index);
+			if (each.getBookingRef() == "") {
+				i++;
+				if (i <= seatsRequestedCount) {
+					availableSeats.add(each);
+				}
+			}
+		}
+		return availableSeats;
 	}
 }

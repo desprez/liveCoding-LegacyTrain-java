@@ -31,60 +31,25 @@ public class WebTicketManager {
 		dataTrainService = new DataTrainServiceImpl();
 	}
 
-	public String reserve(final String train, final int seats) throws IOException, InterruptedException {
-		final List<Seat> availableSeats = new ArrayList<Seat>();
-		int count = 0;
-		String result = "";
-		String bookingRef;
+	public String reserve(final String train, final int seatsRequestedCount) throws IOException, InterruptedException {
 
 		// get the train
 		final String JsonTrain = dataTrainService.getTrain(train);
 
-		result = JsonTrain;
-
 		final Train trainInst = new Train(JsonTrain);
-		if (trainInst.ReservedSeats + seats <= Math.floor(ThresholdManager.getMaxRes() * trainInst.getMaxSeat())) {
-			int numberOfReserv = 0;
-			// find seats to reserve
-			for (int index = 0, i = 0; index < trainInst.Seats.size(); index++) {
-				final Seat each = trainInst.Seats.get(index);
-				if (each.getBookingRef() == "") {
-					i++;
-					if (i <= seats) {
-						availableSeats.add(each);
-					}
-				}
-			}
+		if (trainInst.doesNotExceedOverallTrainCapacityLimit(seatsRequestedCount)) {
 
-			for (final Seat seat : availableSeats) {
-				count++;
-			}
+			final List<Seat> availableSeats = trainInst.findAvailableSeats(seatsRequestedCount);
 
-			int reservedSets = 0;
+			if (availableSeats.size() == seatsRequestedCount) {
 
-			if (count != seats) {
-				return String.format("{{\"train_id\": \"%s\", \"booking_reference\": \"\", \"seats\": []}}", train);
-			} else {
-
-				bookingRef = bookingReferenceService.getBookingReference();
+				final String bookingRef = bookingReferenceService.getBookingReference();
 
 				for (final Seat availableSeat : availableSeats) {
 					availableSeat.setBookingRef(bookingRef);
-					numberOfReserv++;
-					reservedSets++;
 				}
-			}
-
-			if (numberOfReserv == seats) {
 
 				trainCaching.Save(toSeatsEntities(train, availableSeats, bookingRef));
-
-				if (reservedSets == 0) {
-					final String output = String.format("Reserved seat(s): ", reservedSets);
-					System.out.println(output);
-				}
-
-				final String todod = "[TODOD]";
 
 				dataTrainService.applyReservation(train, availableSeats, bookingRef);
 
@@ -95,6 +60,8 @@ public class WebTicketManager {
 		}
 		return String.format("{{\"train_id\": \"%s\", \"booking_reference\": \"\", \"seats\": []}}", train);
 	}
+
+
 
 	private String dumpSeats(final List<Seat> seats) {
 		final StringBuilder sb = new StringBuilder("[");
