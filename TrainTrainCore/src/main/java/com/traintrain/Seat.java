@@ -6,16 +6,16 @@ public class Seat {
 
 	private int seatNumber;
 
-	private String bookingRef;
+	private String bookingReference;
 
 	public Seat(final String coach, final int seatNumber) {
 		this(coach, seatNumber, "");
 	}
 
-	public Seat(final String coachName, final int seatNumber, final String bookingRef) {
+	public Seat(final String coachName, final int seatNumber, final String bookingReference) {
 		this.coachName = coachName;
 		this.seatNumber = seatNumber;
-		this.bookingRef = bookingRef;
+		this.bookingReference = bookingReference;
 	}
 
 	public String getCoachName() {
@@ -34,12 +34,12 @@ public class Seat {
 		this.seatNumber = seatNumber;
 	}
 
-	public String getBookingRef() {
-		return bookingRef;
+	public String getBookingReference() {
+		return bookingReference;
 	}
 
-	public void setBookingRef(final String bookingRef) {
-		this.bookingRef = bookingRef;
+	public void setBookingReference(final String bookingReference) {
+		this.bookingReference = bookingReference;
 	}
 
 	@Override

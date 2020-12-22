@@ -24,7 +24,7 @@ public class BookingAttempt {
 
 	public void assignBookingReference(final String bookingReference) {
 		for (final Seat availableSeat : getAvailableSeats()) {
-			availableSeat.setBookingRef(bookingReference);
+			availableSeat.setBookingReference(bookingReference);
 		}
 	}
 

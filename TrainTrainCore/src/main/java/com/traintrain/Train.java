@@ -2,8 +2,10 @@ package com.traintrain;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,11 +14,9 @@ public class Train {
 
 	public int ReservedSeats;
 
-	public List<Seat> Seats;
+	public Map<String, Coach> coaches = new HashMap<>();
 
 	public Train(final String trainTopol) throws IOException {
-
-		Seats = new ArrayList<Seat>();
 
 		// var sample:
 		// "{\"seats\": {\"1A\": {\"booking_reference\": \"\", \"seat_number\": \"1\",
@@ -31,24 +31,37 @@ public class Train {
 		for (final Map<String, SeatJson> value : stuff_in_stuff.values()) {
 			for (final SeatJson seatJson : value.values()) {
 				final int seat_number = Integer.parseInt(seatJson.seat_number);
-				Seats.add(new Seat(seatJson.coach, seat_number, seatJson.booking_reference));
-				if (!(new Seat(seatJson.coach, seat_number, seatJson.booking_reference).getBookingRef() == "")) {
-					ReservedSeats++;
+
+				final Seat seat = new Seat(seatJson.coach, seat_number, seatJson.booking_reference);
+
+				Coach coach = coaches.get(seat.getCoachName());
+				if (coach == null) {
+					coach = new Coach(seat.getCoachName());
+					coaches.put(seat.getCoachName(), coach);
 				}
+				coach.addSeat(seat);
 			}
 		}
 	}
 
 	public int getMaxSeat() {
-		return Seats.size();
+		return getSeats().size();
+	}
+
+	public List<Seat> getSeats() {
+		return coaches.values().stream().map(x -> x.getSeats()).flatMap(List::stream).collect(Collectors.toList());
 	}
 
 	public boolean hasLessThanThreshold(final int i) {
-		return ReservedSeats < i;
+		return getReservedSeats() < i;
+	}
+
+	private long getReservedSeats() {
+		return getSeats().stream().filter(seat -> !seat.getBookingReference().isEmpty()).count();
 	}
 
 	public boolean doesNotExceedOverallTrainCapacityLimit(final int seatsRequestedCount) {
-		return ReservedSeats + seatsRequestedCount <= Math.floor(ThresholdManager.getMaxRes() * getMaxSeat());
+		return getReservedSeats() + seatsRequestedCount <= Math.floor(ThresholdManager.getMaxRes() * getMaxSeat());
 	}
 
 	public BookingAttempt buildBookingAttempt(final int seatsRequestedCount) {
@@ -56,9 +69,9 @@ public class Train {
 		final List<Seat> availableSeats = new ArrayList<Seat>();
 
 		// find seats to reserve
-		for (int index = 0, i = 0; index < Seats.size(); index++) {
-			final Seat each = Seats.get(index);
-			if (each.getBookingRef() == "") {
+		for (int index = 0, i = 0; index < getMaxSeat(); index++) {
+			final Seat each = getSeats().get(index);
+			if (each.getBookingReference().isEmpty()) {
 				i++;
 				if (i <= seatsRequestedCount) {
 					availableSeats.add(each);
@@ -66,5 +79,9 @@ public class Train {
 			}
 		}
 		return new BookingAttempt(seatsRequestedCount, availableSeats);
+	}
+
+	public Map<String, Coach> getCoaches() {
+		return coaches;
 	}
 }
