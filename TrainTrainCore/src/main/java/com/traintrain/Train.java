@@ -51,7 +51,7 @@ public class Train {
 		return ReservedSeats + seatsRequestedCount <= Math.floor(ThresholdManager.getMaxRes() * getMaxSeat());
 	}
 
-	public List<Seat> findAvailableSeats(final int seatsRequestedCount) {
+	public BookingAttempt buildBookingAttempt(final int seatsRequestedCount) {
 
 		final List<Seat> availableSeats = new ArrayList<Seat>();
 
@@ -65,6 +65,6 @@ public class Train {
 				}
 			}
 		}
-		return availableSeats;
+		return new BookingAttempt(seatsRequestedCount, availableSeats);
 	}
 }
