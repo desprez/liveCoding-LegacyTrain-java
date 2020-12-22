@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -65,7 +64,6 @@ public class WebTicketManagerShould {
 		.isEqualTo("{{\"train_id\": \"9043-2020-12-21\", \"booking_reference\": \"\", \"seats\": []}}");
 	}
 
-	@Ignore
 	@Test
 	public void reserve_all_seats_in_same_coach() throws IOException, InterruptedException {
 		// given
@@ -81,5 +79,7 @@ public class WebTicketManagerShould {
 		assertThat(reservation).isEqualTo(
 				"{{\"train_id\": \"9043-2020-12-21\", \"booking_reference\": \"2dadaz4\", \"seats\": [\"1B\", \"2B\"]}}");
 	}
+
+
 
 }
