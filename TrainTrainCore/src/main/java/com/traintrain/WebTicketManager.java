@@ -24,15 +24,15 @@ public class WebTicketManager {
 		dataTrainService = new DataTrainServiceImpl();
 	}
 
-	public String reserve(final String train, final int seatsRequestedCount) throws IOException, InterruptedException {
+	public String reserve(final String trainId, final int seatsRequestedCount) throws IOException, InterruptedException {
 
 		// get the train
-		final String JsonTrain = dataTrainService.getTrain(train);
+		final String JsonTrain = dataTrainService.getTrain(trainId);
 
-		final Train trainInst = new Train(JsonTrain);
-		if (trainInst.doesNotExceedOverallTrainCapacityLimit(seatsRequestedCount)) {
+		final Train train = new Train(JsonTrain);
+		if (train.doesNotExceedOverallTrainCapacityLimit(seatsRequestedCount)) {
 
-			final BookingAttempt bookingAttempt = trainInst.buildBookingAttempt(seatsRequestedCount);
+			final BookingAttempt bookingAttempt = train.buildBookingAttempt(seatsRequestedCount);
 
 			if (bookingAttempt.isFullFilled()) {
 
@@ -40,14 +40,14 @@ public class WebTicketManager {
 
 				bookingAttempt.assignBookingReference(bookingRef);
 
-				dataTrainService.applyReservation(train, bookingAttempt.getAvailableSeats(), bookingRef);
+				dataTrainService.applyReservation(trainId, bookingAttempt.getAvailableSeats(), bookingRef);
 
-				return String.format("{{\"train_id\": \"%s\", \"booking_reference\": \"%s\", \"seats\": %s}}", train,
+				return String.format("{{\"train_id\": \"%s\", \"booking_reference\": \"%s\", \"seats\": %s}}", trainId,
 						bookingRef, dumpSeats(bookingAttempt.getAvailableSeats()));
 			}
 
 		}
-		return String.format("{{\"train_id\": \"%s\", \"booking_reference\": \"\", \"seats\": []}}", train);
+		return String.format("{{\"train_id\": \"%s\", \"booking_reference\": \"\", \"seats\": []}}", trainId);
 	}
 
 	private String dumpSeats(final List<Seat> seats) {

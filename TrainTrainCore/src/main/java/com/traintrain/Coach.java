@@ -3,6 +3,9 @@ package com.traintrain;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 public class Coach {
 
 	private static final double COACH_MAX_THRESHOLD_RESERVABLE_SEATS = 0.70;
@@ -49,7 +52,36 @@ public class Coach {
 				.floor(COACH_MAX_THRESHOLD_RESERVABLE_SEATS * seats.size());
 	}
 
-	private long getReservedSeats() {
+	public long getReservedSeats() {
 		return getSeats().stream().filter(seat -> !seat.isAvailable()).count();
 	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Coach)) {
+			return false;
+		}
+		final Coach other = (Coach) obj;
+		return new EqualsBuilder() //
+				.append(getName(), other.getName()) //
+				.append(getSeats(), other.getSeats()) //
+				.append(getReservedSeats(), other.getReservedSeats()) //
+				.isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder() //
+				.append(getName()) //
+				.append(getSeats()) //
+				.append(getReservedSeats()) //
+				.toHashCode();
+	}
+
 }

@@ -6,10 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class Train {
+public class Train implements ValueObject {
 
 	private static final double TRAIN_MAX_THRESHOLD_RESERVABLE_SEATS = 0.70;
 
@@ -104,4 +107,31 @@ public class Train {
 	public Map<String, Coach> getCoaches() {
 		return coaches;
 	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Train)) {
+			return false;
+		}
+		final Train other = (Train) obj;
+		return new EqualsBuilder() //
+				.append(getReservedSeats(), other.getReservedSeats()) //
+				.append(getCoaches(), other.getCoaches()) //
+				.isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder() //
+				.append(getReservedSeats()) //
+				.append(getCoaches()) //
+				.toHashCode();
+	}
+
 }

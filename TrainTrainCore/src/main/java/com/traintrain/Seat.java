@@ -1,6 +1,9 @@
 package com.traintrain;
 
-public class Seat {
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+public class Seat implements ValueObject {
 
 	private String coachName;
 
@@ -50,4 +53,33 @@ public class Seat {
 	public boolean isAvailable() {
 		return getBookingReference().isEmpty();
 	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Seat)) {
+			return false;
+		}
+		final Seat other = (Seat) obj;
+		return new EqualsBuilder() //
+				.append(getCoachName(), other.getCoachName()) //
+				.append(getSeatNumber(), other.getSeatNumber()) //
+				.append(getBookingReference(), other.getBookingReference()) //
+				.isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder() //
+				.append(getCoachName()) //
+				.append(getSeatNumber()) //
+				.append(getBookingReference()) //
+				.toHashCode();
+	}
+
 }
